@@ -116,6 +116,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="printHello.cpp" />
+    <ClCompile Include="数组.cpp" />
     <ClCompile Include="源.cpp" />
     <ClCompile Include="程序流程结构.cpp" />
     <ClCompile Include="运算符note.cpp" />
