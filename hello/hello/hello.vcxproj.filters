@@ -24,10 +24,19 @@
     <ClCompile Include="程序流程结构.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="源.cpp">
+    <ClCompile Include="数组.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="数组.cpp">
+    <ClCompile Include="git_bash.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="函数.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="指针.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="结构体.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
