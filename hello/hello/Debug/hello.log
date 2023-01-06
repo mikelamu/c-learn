@@ -1,25 +1,2 @@
-﻿  结构体.cpp
-d:\vs_pro\hello\hello\结构体.cpp(24): error C2062: 意外的类型“Student”
-d:\vs_pro\hello\hello\结构体.cpp(26): error C3927: "->": 非函数声明符后不允许尾随返回类型
-d:\vs_pro\hello\hello\结构体.cpp(26): error C3484: 语法错误: 返回类型前应为“->”
-d:\vs_pro\hello\hello\结构体.cpp(26): error C3613: “->”后缺少返回类型(假定为“int”)
-d:\vs_pro\hello\hello\结构体.cpp(26): error C4430: 缺少类型说明符 - 假定为 int。注意: C++ 不支持默认 int
-d:\vs_pro\hello\hello\结构体.cpp(26): error C2146: 语法错误: 缺少“;”(在标识符“name”的前面)
-d:\vs_pro\hello\hello\结构体.cpp(27): error C3927: "->": 非函数声明符后不允许尾随返回类型
-d:\vs_pro\hello\hello\结构体.cpp(27): error C3484: 语法错误: 返回类型前应为“->”
-d:\vs_pro\hello\hello\结构体.cpp(27): error C3613: “->”后缺少返回类型(假定为“int”)
-d:\vs_pro\hello\hello\结构体.cpp(27): error C4430: 缺少类型说明符 - 假定为 int。注意: C++ 不支持默认 int
-d:\vs_pro\hello\hello\结构体.cpp(27): error C2086: “int s1”: 重定义
-  d:\vs_pro\hello\hello\结构体.cpp(26): note: 参见“s1”的声明
-d:\vs_pro\hello\hello\结构体.cpp(27): error C2146: 语法错误: 缺少“;”(在标识符“age”的前面)
-d:\vs_pro\hello\hello\结构体.cpp(28): error C3927: "->": 非函数声明符后不允许尾随返回类型
-d:\vs_pro\hello\hello\结构体.cpp(28): error C3484: 语法错误: 返回类型前应为“->”
-d:\vs_pro\hello\hello\结构体.cpp(28): error C3613: “->”后缺少返回类型(假定为“int”)
-d:\vs_pro\hello\hello\结构体.cpp(28): error C4430: 缺少类型说明符 - 假定为 int。注意: C++ 不支持默认 int
-d:\vs_pro\hello\hello\结构体.cpp(28): error C2086: “int s1”: 重定义
-  d:\vs_pro\hello\hello\结构体.cpp(26): note: 参见“s1”的声明
-d:\vs_pro\hello\hello\结构体.cpp(28): error C2146: 语法错误: 缺少“;”(在标识符“score”的前面)
-d:\vs_pro\hello\hello\结构体.cpp(29): error C2143: 语法错误: 缺少“;”(在“<<”的前面)
-d:\vs_pro\hello\hello\结构体.cpp(29): error C4430: 缺少类型说明符 - 假定为 int。注意: C++ 不支持默认 int
-d:\vs_pro\hello\hello\结构体.cpp(30): error C2059: 语法错误:“}”
-d:\vs_pro\hello\hello\结构体.cpp(30): error C2143: 语法错误: 缺少“;”(在“}”的前面)
+﻿  通讯录管理系统.cpp
+  hello.vcxproj -> D:\vs_pro\hello\Debug\hello.exe
