@@ -11,6 +11,7 @@
 #include<iostream>
 #include<string>
 using namespace std;
+#define max 100
 // 显示界面函数
 void show_menu()
 {
@@ -26,11 +27,53 @@ void show_menu()
 	}
 	
 }
+// define person construct
+struct person
+{
+	string name;
+	string phone;
+};
+
+struct person_array 
+{
+	person member[max];
+	int indx = 0;
+};
+
+void add_person(person_array * parray)
+{
+	string name;
+	string phone;
+	cout << "please input the name : " << endl;
+	cin >> name;
+	parray->member[parray->indx].name = name;
+	cout << "please input the phone number :" << endl;
+	cin >> phone;
+	parray->member[parray->indx].phone = phone;
+	parray->indx += 1;
+	cout << "add success !" << endl;
+	system("pause");
+	system("cls"); // clear the screen
+}
+//display personarray
+void dis_person(person_array * parray)
+{
+	int len = parray->indx;
+	for (int i = 0; i < len; i++)
+	{
+		cout << "name is :" << parray->member[i].name << " phone number is :" 
+		<<parray->member[i].phone << endl;
+	}
+	system("pause");
+	system("cls"); // clear the screen
+}
 // 思路 利用switch实现
 int main() 
 {
 	//创建一个选择输入的变量
 	int select = 0;
+	//creat a personarray
+	person_array parray;
 	while (true)
 	{
 		show_menu();
@@ -38,8 +81,10 @@ int main()
 		switch (select)  // "添加", "显示", "删除", "查找", "修改", "清空", "退出"
 		{
 		case 1:		// "添加" 利用地址传递
+			add_person(&parray);
 			break;
 		case 2:
+			dis_person(&parray);
 			break;
 		case 3:
 			break;
@@ -57,7 +102,7 @@ int main()
 		default:
 			break;
 		}
-		system("pause");
+		
 		
 	}
 
