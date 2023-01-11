@@ -1,3 +1,4 @@
 ﻿  对象特性.cpp
-d:\vs_pro\hello\hello\对象特性.cpp(187): warning C4326: “main”的返回类型应为“int”而非“void”
+d:\vs_pro\hello\hello\对象特性.cpp(287): warning C4101: “p”: 未引用的局部变量
+d:\vs_pro\hello\hello\对象特性.cpp(330): warning C4326: “main”的返回类型应为“int”而非“void”
   hello.vcxproj -> D:\vs_pro\hello\Debug\hello.exe

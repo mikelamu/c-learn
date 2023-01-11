@@ -28,7 +28,39 @@
 			深拷贝：堆区重新申请空间
 	6、 初始化列表
 		语法：构造函数():属性1（值1），属性2（值2）{ }
-			
+	7、类对象作为类成员
+			先构造类成员对象，再构造自身；析构的时候先析构自身，再析构类成员
+	8、静态成员
+			静态成员变量：
+				所有对象共享一份数据
+				编译阶段分配内存
+				类内声明，类外初始化
+					1、通过对象进行访问
+					2、通过类名访问，类名加上作用域  类名::静态变量名
+					3、私有权限无法访问
+			静态成员函数：
+				所有对象共享一个函数
+				静态成员函数只能访问静态成员变量
+					1、两种访问方式，类名与对象访问
+					2、也有访问权限
+	9、对象模型和this指针
+		c++中，类内的成员变量和成员函数分开存储
+		只有非静态成员变量属于类的对象上，静态变量与成员函数都不属于类的对象
+		this指针
+			this指针指向被调用的成员函数所属的对象
+			this指针不需要定义，直接使用即可
+			用途：1形参与成员变量同名时，使用this指针来区分
+				2、在类的非静态成员函数中返回对象本身，可使用return * this
+	10、空指针访问成员函数
+		c++中空指针也可以调用成员函数，但是要注意有没有用到this指针
+	11、const修饰成员函数
+		常函数：
+			成员函数加const修饰后
+			常函数不可以修改成员属性
+			成员属性声明是加关键词mutable后，在常函数中依然可以修改
+		常对象：
+			声明对象前加const称该对象为常对象
+			常对象只能调用常函数
 */
 #include<iostream>
 #include<string>
@@ -177,15 +209,169 @@ public:
 	int A;
 	int B;
 	int C;
-	human(int a, int b, int c):A(a),B(b),C(c)//直接赋值
+	human(int a, int b, int c):A(a),B(b),C(c)// 直接赋值
 	{
 	}
 };
+//7、类对象作为类成员
+class A
+{
+public:
+	A()
+	{
+		cout << "A构造" << endl;
+	}
+	~A()
+	{
+		cout << "A析构" << endl;
+	}
+};
+class B
+{
+public:
+	B()
+	{
+		cout << "B构造" << endl;
+		
+	}
+	~B()
+	{
+		cout << "B析构" << endl;
+	}
+	A a;
+};
+//先构造A再构造B
+void test06()
+{
+	B b1;
+}
+//8、静态成员
+//	静态成员变量：
+//		所有对象共享一份数据
+//		编译阶段分配内存
+//		类内声明，类外初始化
+//	静态成员函数：
+//		所有对象共享一个函数
+//		静态成员函数只能访问静态成员变量
+class person4
+{
+public:
+//	静态成员变量：
+//		所有对象共享一份数据
+//		编译阶段分配内存
+//		必须类内声明，类外初始化
+	static int m_A;
+	static void func()
+	{
+		m_A = 0;
+	}
 
+};
+int person4::m_A = 10;
+void test07()
+{
+	person4 p;
+	cout << p.m_A << endl;
+	person4 p1;
+//	所有对象共享一份数据
+//	1、通过对象进行访问
+	p1.m_A = 1;
+//  2、 通过类名访问
+	person4::m_A = 2;
+	cout << p.m_A << endl;
+	p1.func();
+	person4::func();
+	cout << p.m_A << endl;
+}
+//9、对象模型和this指针
+//	c++中，类内的成员变量和成员函数分开存储
+//	只有非静态成员变量属于类的对象上
+class emp
+{
 
+};
+void test09()
+{
+	emp p;//c++编译器会给每个空对象分配一个字节空间
 
+}
+//this指针
+//this指针指向被调用的成员函数所属的对象
+//this指针不需要定义，直接使用即可
+//用途：1形参与成员变量同名时，使用this指针来区分
+//2、在类的非静态成员函数中返回对象本身，可使用return * this
+class person09
+{
+public:
+	person09(int age)
+	{
+		//this 指针指向被调用的成员函数所属的对象
+		this->age = age;
+	}
+	person09& add() //引用返回是返回自身的对象，值返回是返回一个新对象
+	{
+		return *this;
+	}
+	int age;
+};
+//10、空指针访问成员函数
+//c++中空指针也可以调用成员函数，但是要注意有没有用到this指针
+class person10
+{
+public:
+	void showname()
+	{
+		cout << "person10 class" << endl;
+	}
+	void showage()
+	{
+		cout << "age is :" << age << endl;
+	}
+	int age;
+};
+void test10()
+{
+	person10 * p = NULL;
+	p->showname();
+	p->showage();
+}
+
+//11、const修饰成员函数
+	//常函数：
+	//成员函数加const修饰后
+	//常函数不可以修改成员属性
+	//成员属性声明是加关键词mutable后，在常函数中依然可以修改
+
+class person11
+{
+public:
+	//this指针的本质是指针常量，指针的指向不可修改
+	//person11 * const
+	//如果函数加了const修饰
+	//变成 const person11 * const 指针指向的值也不可修改
+
+	void showperson() const
+	{
+		m_A = 10;
+	}
+	int m_age;
+	mutable int m_A;//特殊变量，即使在常函数中，也可以修改
+};
+//常对象：
+//	声明对象前加const称该对象为常对象
+//	常对象只能调用常函数
+void test12()
+{
+	const person11 p;// add const 变为常对象
+	p.m_A = 1;
+	//p.m_age = 1;//报错
+	p.showperson();//只能调用常函数
+
+}
 void main() {
-	human h1(1, 2, 6);
-	cout << h1.A << " " << h1.B << " " << h1.C << endl;
+	//human h1(1, 2, 6);
+	//cout << h1.A << " " << h1.B << " " << h1.C << endl;
+	//test06();
+	test10();
 	system("pause");
 }
