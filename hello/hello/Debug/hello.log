@@ -1,3 +1,3 @@
 ﻿  运算符重载.cpp
-d:\vs_pro\hello\hello\运算符重载.cpp(49): warning C4326: “main”的返回类型应为“int”而非“void”
+d:\vs_pro\hello\hello\运算符重载.cpp(91): warning C4326: “main”的返回类型应为“int”而非“void”
   hello.vcxproj -> D:\vs_pro\hello\Debug\hello.exe
