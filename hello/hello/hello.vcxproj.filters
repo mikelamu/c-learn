@@ -69,7 +69,10 @@
     <ClCompile Include="运算符重载.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="4_6重载.cpp">
+    <ClCompile Include="4_6继承.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="05 多态.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
