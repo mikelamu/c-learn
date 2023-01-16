@@ -75,5 +75,8 @@
     <ClCompile Include="05 多态.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="06 文件操作.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

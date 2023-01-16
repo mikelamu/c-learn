@@ -23,67 +23,73 @@
 			抽象类特点：
 				1、无法实例化对象
 				2、子类必须重写父类的纯虚函数，否则也是抽象类
+		虚析构和纯虚析构：
+			父类指针释放子类对象问题:如果子类有属性开辟到堆区，那么父类指针在释放时不能调用到子类的析构代码
+			通过将父类的析构函数改为虚析构或者纯虚析构解决
+			父类指针在析构时候不会调用子类的析构函数，需要改为虚析构
+			纯虚析构需要有具体的实现，在父类析构时会被调用
+			有纯虚析构都是抽象类，无法实例化
+
 */
 #include<iostream>
 #include<string>
 using namespace std;
-class Animal
+class CPU
 {
 public:
-	virtual void speak()
+	virtual void calculate() = 0;
+};
+class Intel :public CPU
+{
+public:
+	void calculate()
 	{
-		cout << "Animal is speaking" << endl;
+		cout << "Intel CPU starts working !" << endl;
 	}
 };
-class Cat : public Animal
+class Lenovo :public CPU
 {
 public:
-	virtual void speak()
+	void calculate()
 	{
-		cout << "Cat is speaking" << endl;
+		cout << "Lenovo CPU starts working !" << endl;
+	}
+};
+class Computer
+{
+public:
+	Computer(CPU * cpu)
+	{
+		Computer::cpu = cpu;
+	}
 
-	}
-};
-class AbsDrinking
-{
-public:
-	virtual void Boil() = 0;
-	virtual void Brew() = 0;
-};
-class Tea:public AbsDrinking
-{
-public:
-	void Boil()
+	void calculate()
 	{
-		cout << "Boiling Water " << endl;
+		cpu->calculate();
 	}
-	void Brew()
-	{
-		cout << "Add tea." << endl;
-	}
+	CPU * cpu;
+
 };
-class Coffee :public AbsDrinking
+Computer * test01()
 {
-public:
-	void Boil()
-	{
-		cout << "Boiling Coffee " << endl;
-	}
-	void Brew()
-	{
-		cout << "Add Coffee." << endl;
-	}
-};
-void test01(AbsDrinking &drink)
-{
-	drink.Boil();
-	drink.Brew();
-	delete &drink;
+	Lenovo * lenovo = new Lenovo;
+	Intel * intel = new Intel;
+	Computer * c1 = new Computer(lenovo);
+	Computer c2 = Computer(intel);
+	c1->calculate();
+	c2.calculate();
+	delete lenovo;
+	delete intel;
+	return c1;
 }
 int main()
 {
-	test01(* new Coffee);
-	test01(* new Tea);
+	Computer * p = NULL;
+	p = test01();
+	if (p != NULL)
+	{
+		p->calculate();
+	}
 	system("pause");
 	return 0;
 }

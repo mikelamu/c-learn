@@ -1,2 +1,4 @@
-﻿  05 多态.cpp
+﻿  06 文件操作.cpp
+d:\vs_pro\hello\hello\06 文件操作.cpp(104): warning C4101: “pr”: 未引用的局部变量
+d:\vs_pro\hello\hello\06 文件操作.cpp(110): warning C4326: “main”的返回类型应为“int”而非“void”
   hello.vcxproj -> D:\vs_pro\hello\Debug\hello.exe
