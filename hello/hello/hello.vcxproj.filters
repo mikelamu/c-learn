@@ -69,9 +69,6 @@
     <ClCompile Include="运算符重载.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="4_6继承.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="05 多态.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -81,5 +78,19 @@
     <ClCompile Include="07 模板.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="04 继承.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="person.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="2_1 STL初识.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="person.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
