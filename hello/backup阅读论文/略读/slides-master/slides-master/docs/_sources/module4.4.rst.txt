@@ -1,0 +1,215 @@
+
+Module 4.4 - Advanced NNs 2
+=============================================
+
+Module 4.4
+------------
+
+   Softmax
+
+
+
+ReLU
+-------------
+
+Mathematically,
+
+.. math::
+
+   \text{ReLU}(x) = \max\{0, x\}
+
+Simplest `max` function.
+
+
+Step
+------
+
+Mathematically,
+
+.. math::
+
+   \text{step}(x) = x > 0 = \arg\max\{0, x\}
+
+Simplest `argmax` function.
+
+
+Relationship
+-------------
+
+Step is derivative of ReLU
+
+.. math::
+   \begin{eqnarray*}
+   \text{ReLU}'(x) &=& \begin{cases} 0 & \text{if } x \leq 0 \\ 1 & \text{ow}  \end{cases} \\
+   \text{step}(x) &=& \text{ReLU}'(x)
+   \end{eqnarray*}
+
+
+What's wrong with step?
+------------------------
+   
+.. image:: figs/Graphs/incorrect.png
+           :align: center
+           :width: 350px
+
+Loss of step tells us how many points are wrong.
+
+Altenative Function: Sigmoid
+-----------------------------
+
+Used to determine the loss function
+
+
+.. image:: figs/Graphs/sigmoid.png
+           :align: center
+           :width: 400px
+
+Max reduction
+--------------
+
+* Max is a binary associative operator
+
+* :math:`\max(a, b)` returns max value
+
+* Generalized :math:`\text{ReLU}(a) = \max(a, 0)`
+
+Argmax
+------
+
+* Function that returns `argmax`, one-hot
+* Generalizes step
+
+.. image:: figs/Conv/argmax.png
+
+Soft argmax?
+-------------
+
+* Need a soft version of argmax.
+* Generalizes sigmoid for our new loss function
+* Standard name -> softmax
+
+Softmax
+-------
+
+.. math::
+
+   \text{softmax}(\textbf{x}) = \frac{\exp \textbf{x}}{\sum_i \exp x_i}
+
+Softmax
+-------
+
+* `Colab <https://colab.research.google.com/drive/1EB7MI_3gzAR1gFwPPO27YU9uYzE_odSu>`_
+
+   
+Review
+-------
+
+======= ============
+Binary  Multiclass
+======= ============
+ReLU     Max
+Step     Argmax
+Sigmoid  Softmax
+======= ============
+
+Quiz
+----
+
+Quiz
+
+
+
+
+Review
+-------
+
+
+Soft Gates
+============
+
+New Methods
+----------------
+
+* Sigmoid and softmax produce distributions
+* Can be used to "control" information flow
+
+Example
+-------
+
+Returns a combination of x and y
+
+.. math::
+
+   f(x, y, r) = x * \sigma(r) + y * (1 - \sigma(r))
+
+
+Gradient is controlled
+-----------------------
+
+.. math::
+
+   f'_x(x, y, r) &= \sigma(r) \\
+   f'_y(x, y, r) &= (1 - \sigma( r))\\
+   f'_r(x, y, r) &= (x -  y) \sigma'(r)
+
+
+Neural Network Gates
+-----------------------
+
+Learn which one of the previous layers is most useful.
+
+.. math::
+
+   r &= NN_1 \\
+   x &= NN_2 \\
+   y &= NN_3
+
+
+Gradient Flow
+--------------
+
+* Layers that are used get more updates
+* Gradient signals which aspect was important
+* Can have extra layers
+
+
+Selecting Choices
+-------------------
+
+.. revealjs_fragments::
+
+   * Gating gives us a binary choice
+   * What if we want to select between many elements?
+   * Softmax!
+
+Softmax Gating
+---------------
+
+Combines many elements of X based on R
+
+.. math::
+
+   f(X, R) = X \times softmax(R)
+
+
+Softmax Gating
+---------------
+
+* Brand name: Attention
+*
+
+Example: Translation
+--------------------
+
+* Show example
+
+
+Example: GPT-3
+--------------------
+
+* Show example
+
+
+
+Q&A
+----

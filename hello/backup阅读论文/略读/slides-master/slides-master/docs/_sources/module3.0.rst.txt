@@ -1,0 +1,519 @@
+
+
+
+Module 3.0 - Efficiency 
+=============================================
+
+
+Module 3.0
+------------
+
+  Efficiency 
+
+
+Outline
+---------
+
+.. revealjs_fragments::
+
+   * Motivating Example: Simple NLP
+   * Efficiency
+   * Fast Math
+   * Parallelism
+
+Simple NLP
+===========
+
+Classification in NLP
+----------------------------
+
+.. revealjs_fragments::
+
+
+   * Systems for predicting based on word features
+
+
+Sentiment Classification
+-------------------------
+
+.. revealjs_fragments::
+
+   * Canonical sentence classification problem
+
+   * Given sentence predict sentiment class
+
+   * Key aspects: word polarity
+
+
+Data
+------
+
+.. image:: figs/NLP/negative.png
+           :align: center
+
+Data
+--------------------
+
+.. image:: figs/NLP/positive.png
+           :align: center
+
+Loss
+-----
+
+.. revealjs_fragments::
+
+   * Same as our basic problem.
+
+.. image:: figs/NLP/weight.png
+           :align: center
+
+
+
+Training
+---------
+
+.. revealjs_fragments::
+
+   * Same as our basic problem.
+
+
+Problem Setup
+---------------
+
+.. revealjs_fragments::
+
+   * Training: Exactly the same as simple
+   * Loss: Exactly the same as simple
+   * Models: Mostly similar to the simple problem.
+
+
+
+Modeling Challenges
+--------------------
+
+.. revealjs_fragments::
+
+   1) Converting words to tensors
+   2) Converting sentences to tensors
+   3) Handling word combinations
+
+
+Word -> Tensors
+===============
+
+
+What is a word?
+----------------
+
+.. revealjs_fragments::
+   * Treat words as index in vocabulary
+   * Represent as a one-hot vector
+
+Challenge1: Vector Form
+------------------------
+
+.. image:: figs/NLP/onehot.png
+           :align: center
+
+
+One-Hot Issue
+--------------
+
+.. revealjs_fragments::
+
+   * Tens of thousands of words
+   * Opposite problem as before, 2-features to 10,000
+   * ``Embedding'' represent high-dim space in low dim
+
+
+Embedding Table
+------------------------
+
+.. image:: figs/NLP/embweight.png
+           :align: center
+
+Intuition: Lookup in Table
+---------------------------
+
+Get word vector ::
+
+  embeddings[word]
+
+* Challenge:  How to compute `backward`
+
+
+Alternative: Lookup by broadcast
+------------------------------------
+
+Get word vector ::
+
+   (embeddings * word_one_hot.view(VOCAB, 1)).sum(0)
+
+
+Embedding One
+------------------------
+
+.. image:: figs/NLP/embone.png
+           :align: center
+
+How does this share information?
+---------------------------------
+
+.. revealjs_fragments::
+   * Similar words have similar embedding dim
+
+   * Dot-product - easy way to tell similarity ::
+
+       (word_emb1 * word_emb2).sum()
+
+   * Differentiable!
+
+
+Embedding Layer
+----------------
+
+Easy to write as a layer ::
+
+  class Embedding(minitorch.Module):
+    def __init__(self, vocab_size, emb_size):
+        super().__init__()
+        self.weights = \
+          minitorch.Parameter(minitorch.rand((vocab_size, emb_size))
+        self.vocab_size = vocab_size
+
+    def forward(input):
+        return (self.weights.values * input.view(self.vocab_size, 1)).sum(0)
+
+Where do these come from?
+--------------------------
+
+.. revealjs_fragments::
+
+   * Trained from a different model
+   * Extracted and posted to use
+   * (Many more details in NLP class)
+
+Examples
+-----------
+
+Embeddings ::
+
+  embedding.weights.value.update(pretrained_weights)
+
+* https://projector.tensorflow.org/
+
+Examples
+-----------
+
+Query 1 ::
+
+   ^(lisbon|portugal|america|washington|rome|athens|london|england|greece|italy)$
+
+Query 2 ::
+
+  ^(doctor|patient|lawyer|client|clerk|customer|author|reader)$
+
+
+
+
+Challenge 2 : Sentence Length
+==============================
+
+
+Sentence Length
+-----------------
+
+.. revealjs_fragments::
+
+   * Examples may be of different length
+   * Need to all be converted to vectors and utilized
+
+
+Challenge: Length Dimension
+------------------------------
+
+.. image:: figs/NLP/senthot.png
+           :align: center
+
+Value Transformation
+---------------------
+
+.. revealjs_fragments::
+
+   * batch x length x vocab
+   * batch x length x feature
+   * batch x feature
+   * batch x hidden
+   * batch
+
+Network
+------------------------
+
+.. image:: figs/NLP/sentemb.png
+           :align: center
+
+
+Reduction / "Pooling"
+------------------------
+
+.. image:: figs/NLP/pooling.png
+           :align: center
+
+
+Benefits
+----------
+
+* Extremely simple
+* Embeddings encode key information
+* Have all the tools we need
+
+
+Full Model
+------------------------
+
+.. image:: figs/NLP/full.png
+           :align: center
+
+Engineering Challenge
+----------------------
+
+* We have a model, how do we scale it? 
+
+
+Efficiency
+===========
+
+Context
+---------
+
+.. revealjs_fragments::
+
+   * We now have a pytorch
+   * All wrappers around `ops`
+   * Need to make `ops` fast
+
+Goal
+---------
+
+Optimize:
+
+   * map
+   * zip
+   * reduce
+
+Code
+---------
+
+Example map ::
+
+   for i in range(len(out)):
+       count(i, out_shape, out_index)
+       broadcast_index(out_index, out_shape, in_shape, in_index)
+       o = index_to_position(out_index, out_strides)
+       j = index_to_position(in_index, in_strides)
+       out[o] = fn(in_storage[j])
+
+
+Why are Python (and friends) "slow"?
+-------------------------------------
+
+.. revealjs_fragments::
+
+   * Function calls
+   * Types
+   * Loops
+
+
+Function Calls
+---------------
+
+* Function calls are not free 
+  
+* Checks for args, special keywords andm lists
+  
+* Methods check for overrides and class inheritance
+
+Types
+------
+
+Critical code  ::
+
+  out[o] = in_storage[j] + 3
+
+
+* Doesn't know type of `in_storage[j]`
+* May need to coerce 3 to float or raise error
+* May even call `__add__` or `__ladd__`!
+
+Loops
+------
+
+* Loops are always run as is.
+* Can't combine similar loops or pull out constant computation.
+* Very hard to run anything in parallel.
+
+Other
+-----
+
+Many other slow things...
+
+* Lists
+* Classes
+* Magic of all kind
+
+
+Fast Math
+==========
+
+Alternative 1: Low-level
+------------------------
+
+Pros:
+
+* Fastest option
+* Commonly used
+
+Cons: Harder to modify
+
+Example: Torch, Numpy
+
+Alternative 2: New Languages
+-----------------------------
+
+Pros:
+
+* Keeps code simple
+* Can be quite fast
+
+Cons: Lose tools and experience
+
+Example: Julia
+
+Alternative 3: Compile Python
+-----------------------------
+
+Pros:
+
+* "Same" language
+* Integrate code
+
+Cons: A bit hacky :)
+
+Example: Numba
+
+Numba
+------
+
+* Python library for speeding up numerical python
+* API: Higher-order functions to produce fast mathmatical code
+* `Numba <https://numba.pydata.org/numba-doc/latest/user/5minguide.html>`_
+
+
+How does it work?
+-----------------
+
+Work ::
+
+
+  def my_code(x, y):
+     for i in range(100):
+         x[i] = y + 20
+  ...
+  my_code(x, y)
+  fast_my_code = numba.njit()(my_code)
+  fast_my_code(x, y)
+  fast_my_code(x, y)
+
+Notebook
+---------
+
+`Colab Notebook <https://colab.research.google.com/drive/1Hiq-1SlKkFh_kkYRhmCvF2-ZOn3oxMv6#scrollTo=mlEoKQzKXkMq>`_
+
+
+Terminology : JIT Compiler
+--------------------------
+
+* Just-in-time
+* Waits until you call a function to compile it
+* Specializes code based on the argument types given.
+
+
+Terminology : LLVM
+-------------------
+
+* Underlying compiler framework to generate code
+* Used by many different languages (C++, Swift, Rust, ...)
+* Generates efficient machine code for the system
+
+
+What do we lose?
+----------------
+
+* `njit` will fail for many python operations
+* No lists, classes, python functions allowed
+* Any different types will cause recompilation
+
+
+Strategy
+--------
+
+* Use Python for general operations
+* Use Numba for the core tensor ops
+* Allow users to add new Numba functions
+
+
+Code Transformation
+----------------------
+
+Transform ::
+
+  def my_code(x, y):
+     for i in prange(100):
+         x[i] = y + 20
+  ...
+  my_code(x, y)
+  fast_my_code = numba.njit(parallel=True)(my_code)
+  fast_my_code(x, y)
+  fast_my_code(x, y)
+
+
+Notebook
+---------
+
+`Colab Notebook <https://colab.research.google.com/drive/1Hiq-1SlKkFh_kkYRhmCvF2-ZOn3oxMv6#scrollTo=mlEoKQzKXkMq>`_
+
+
+
+Module 3
+==========
+
+Task 3.1
+---------
+  Parallel
+
+Task 3.2
+---------
+  Matrix Mult
+
+
+.. image:: figs/Ops/matmul.png
+           :align: center
+
+Task 3.3
+---------
+
+.. image:: figs/gpu/threadid@3x.png
+           :align: center
+
+Task 3.4
+---------
+.. image:: figs/Ops/matmul.png
+           :align: center
+
+Task 3.5
+---------
+
+  Train
+
+Q&A
+----

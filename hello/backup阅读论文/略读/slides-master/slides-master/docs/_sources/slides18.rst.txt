@@ -1,0 +1,188 @@
+
+.. raw:: html
+
+   <link rel="stylesheet" href="_static/revealjs/css/theme/white.css">
+   <link rel="stylesheet" href="_static/default.css">
+
+
+Machine Learning Engineering
+=============================================
+
+
+
+
+Lecture 18
+------------
+
+   Parallel
+
+
+Today's Class
+----------------
+
+.. revealjs_fragments::
+
+   * Review: Matmul
+   * GPUs
+   * CUDA on Numba
+
+MatMul
+=======
+
+
+Fusion
+-------
+
+* Optimization across operator boundary
+* Save speed or memory in by avoiding extra forward/backward
+* Can open even greater optimization gains
+
+
+Example: Matmul
+-------------------
+.. image:: figs/Ops/matmul3d1.png
+           :align: center
+
+Example: Matmul
+-------------------
+
+.. image:: figs/Ops/matmul3d2.png
+           :align: center
+
+Matmul Simple
+-------------------
+
+.. image:: figs/Ops/matmulsimple.png
+           :align: center
+
+
+Computations
+-----------------
+.. image:: figs/Ops/matmul.png
+           :align: center
+
+Starter Code
+-------------
+
+* Walk through output.
+* Find row and column of input
+* Simultaneous zip / reduce.
+
+Example: Matmul
+-------------------
+
+.. image:: figs/Ops/matmul\ back.png
+           :align: center
+
+
+Lecture Quiz
+-------------
+
+  `Quiz <https://canvas.cornell.edu/courses/20583/assignments/171894>`_
+
+
+
+
+CUDA
+=======
+
+
+CUDA
+-----
+
+.. revealjs_fragments::
+
+   * NVidia's programming language for GPU
+   * Compute Unified Device Architecture
+   * Like standard programming but in parallel
+
+Who is CUDA?
+---------------
+
+.. image:: figs/gpu/thread@3x.png
+           :align: center
+
+
+Thread code
+---------------
+
+Code ::
+
+  def add(a, b):
+    b = a + 10
+  cuda_add = numba.cuda.jit()(add)
+
+  cuda_add[1, 1](a, b)
+
+Who is CUDA?
+---------------
+
+.. image:: figs/gpu/block1d@3x.png
+           :align: center
+
+Threads code
+---------------
+
+Code ::
+
+  def add(a, b):
+    b = a + 10
+  cuda_add = numba.cuda.jit()(add)
+
+  cuda_add[1, 10](a, b)
+
+
+Who is CUDA?
+---------------
+
+.. image:: figs/gpu/blockdim@3x.png
+           :align: center
+           :width: 500px
+
+Threads code
+---------------
+
+Code ::
+
+  def add(a, b):
+    b = a + 10
+  cuda_add = numba.cuda.jit()(add)
+
+  cuda_add[1, (10, 10)](a, b)
+
+
+
+Who is CUDA?
+---------------
+
+.. image:: figs/gpu/blockid@3x.png
+           :align: center
+           :width: 500px
+
+Block code
+---------------
+
+Code ::
+
+  def add(a, b):
+    b = a + 10
+  cuda_add = numba.cuda.jit()(add)
+
+  cuda_add[(10, 10), (10, 10)](a, b)
+
+
+Key Idea
+--------
+
+* `add` is run by all threads (inside prange)
+* Can call functions, if they are jitted
+* Communicate through shared memory
+
+Next time...
+-------------
+
+* Why is this useful?
+* How can we talk to others?
+
+Q&A
+----

@@ -1,0 +1,4 @@
+two-stage approaches [44, 14, 12, 62, 51], one-stage approaches [68, 41, 59])
+Sun et al. [53] leverage the soft-argmax operation to retrieve joint locations from heatmaps in a differentiable manner, which allows end-to-end training。
+Tian et al. [54] propose direct pose regression in the one-stage object detection framework.
+ Zanfir et al. [64] use normalizing flows to build a prior on SMPL joint angles for their weakly-supervised method.

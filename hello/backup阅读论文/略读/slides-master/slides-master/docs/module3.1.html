@@ -1,0 +1,482 @@
+
+<!DOCTYPE html>
+
+<html lang="english">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 3.1 - Parallelism</title>
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/revealjs4/dist/reveal.css" />
+    <link rel="stylesheet" href="_static/revealjs4/dist/theme/white.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/revealjs4/plugin/highlight/zenburn.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/thebelab-helper.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    
+
+  </head><body>
+    <div class="reveal">
+        <div class="slides">
+            <section >
+<h1>Module 3.1 - Parallelism</h1>
+</section>
+<section >
+<h2>Module 3.1</h2>
+<blockquote>
+<div><p>Parallelism</p>
+</div></blockquote>
+</section>
+<section >
+<h1>Review</h1>
+</section>
+<section >
+<h2>Classification in NLP</h2>
+<ul class="simple">
+<li class="fragment"><p>Systems for predicting based on word features</p></li>
+</ul>
+</section>
+<section >
+<h2>What is a word?</h2>
+<ul class="simple">
+<li class="fragment"><p>Treat words as index in vocabulary</p></li>
+<li class="fragment"><p>Represent as a one-hot vector</p></li>
+</ul>
+</section>
+<section >
+<h2>Challenge1: Vector Form</h2>
+<img alt="_images/onehot.png" class="align-center" src="_images/onehot.png" />
+</section>
+<section >
+<h2>Embedding Table</h2>
+<img alt="_images/embweight.png" class="align-center" src="_images/embweight.png" />
+</section>
+<section >
+<h2>Challenge: Length Dimension</h2>
+<img alt="_images/senthot.png" class="align-center" src="_images/senthot.png" />
+</section>
+<section >
+<h2>Network</h2>
+<img alt="_images/sentemb.png" class="align-center" src="_images/sentemb.png" />
+</section>
+<section >
+<h2>Reduction / &quot;Pooling&quot;</h2>
+<img alt="_images/pooling.png" class="align-center" src="_images/pooling.png" />
+</section>
+<section >
+<h2>Full Model</h2>
+<img alt="_images/full.png" class="align-center" src="_images/full.png" />
+</section>
+<section >
+<h2>Quiz</h2>
+<p>Quiz</p>
+</section>
+<section >
+<h1>Efficiency</h1>
+</section>
+<section >
+<h2>Context</h2>
+<ul class="simple">
+<li class="fragment"><p>We now have a pytorch</p></li>
+<li class="fragment"><p>All wrappers around <cite>ops</cite></p></li>
+<li class="fragment"><p>Need to make <cite>ops</cite> fast</p></li>
+</ul>
+</section>
+<section >
+<h2>Goal</h2>
+<p>Optimize:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>map</p></li>
+<li><p>zip</p></li>
+<li><p>reduce</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section >
+<h2>Code</h2>
+<p>Example map</p>
+<pre data-id="code"><code data-trim data-noescape class="python">for i in range(len(out)):
+    count(i, out_shape, out_index)
+    broadcast_index(out_index, out_shape, in_shape, in_index)
+    o = index_to_position(out_index, out_strides)
+    j = index_to_position(in_index, in_strides)
+    out[o] = fn(in_storage[j])</code></pre>
+</section>
+<section >
+<h2>Why are Python (and friends) &quot;slow&quot;?</h2>
+<ul class="simple">
+<li class="fragment"><p>Function calls</p></li>
+<li class="fragment"><p>Types</p></li>
+<li class="fragment"><p>Loops</p></li>
+</ul>
+</section>
+<section >
+<h2>Function Calls</h2>
+<ul class="simple">
+<li><p>Function calls are not free</p></li>
+<li><p>Checks for args, special keywords andm lists</p></li>
+<li><p>Methods check for overrides and class inheritance</p></li>
+</ul>
+</section>
+<section >
+<h2>Types</h2>
+<p>Critical code</p>
+<pre data-id="types"><code data-trim data-noescape class="python">out[o] = in_storage[j] + 3</code></pre>
+<ul class="simple">
+<li><p>Doesn't know type of <cite>in_storage[j]</cite></p></li>
+<li><p>May need to coerce 3 to float or raise error</p></li>
+<li><p>May even call <cite>__add__</cite> or <cite>__ladd__</cite>!</p></li>
+</ul>
+</section>
+<section >
+<h2>Loops</h2>
+<ul class="simple">
+<li><p>Loops are always run as is.</p></li>
+<li><p>Can't combine similar loops or pull out constant computation.</p></li>
+<li><p>Very hard to run anything in parallel.</p></li>
+</ul>
+</section>
+<section >
+<h2>Other</h2>
+<p>Many other slow things...</p>
+<ul class="simple">
+<li><p>Lists</p></li>
+<li><p>Classes</p></li>
+<li><p>Magic of all kind</p></li>
+</ul>
+</section>
+<section >
+<h1>Fast Math</h1>
+</section>
+<section >
+<h2>Numba</h2>
+<ul class="simple">
+<li><p>Python library for speeding up numerical python</p></li>
+<li><p>API: Higher-order functions to produce fast mathmatical code</p></li>
+<li><p><a class="reference external" href="https://numba.pydata.org/numba-doc/latest/user/5minguide.html">Numba</a></p></li>
+</ul>
+</section>
+<section >
+<h2>How does it work?</h2>
+<p>Work</p>
+<pre data-id="how-does-it-work"><code data-trim data-noescape class="python">def my_code(x, y):
+   for i in range(100):
+       x[i] = y + 20
+...
+my_code(x, y)
+fast_my_code = numba.njit()(my_code)
+fast_my_code(x, y)
+fast_my_code(x, y)</code></pre>
+</section>
+<section >
+<h2>Notebook</h2>
+<p><a class="reference external" href="https://colab.research.google.com/drive/1Hiq-1SlKkFh_kkYRhmCvF2-ZOn3oxMv6#scrollTo=mlEoKQzKXkMq">Colab Notebook</a></p>
+</section>
+<section >
+<h2>Terminology : JIT Compiler</h2>
+<ul class="simple">
+<li><p>Just-in-time</p></li>
+<li><p>Waits until you call a function to compile it</p></li>
+<li><p>Specializes code based on the argument types given.</p></li>
+</ul>
+</section>
+<section >
+<h2>Terminology : LLVM</h2>
+<ul class="simple">
+<li><p>Underlying compiler framework to generate code</p></li>
+<li><p>Used by many different languages (C++, Swift, Rust, ...)</p></li>
+<li><p>Generates efficient machine code for the system</p></li>
+</ul>
+</section>
+<section >
+<h2>What do we lose?</h2>
+<ul class="simple">
+<li><p><cite>njit</cite> will fail for many python operations</p></li>
+<li><p>No lists, classes, python functions allowed</p></li>
+<li><p>Any different types will cause recompilation</p></li>
+</ul>
+</section>
+<section >
+<h2>Strategy</h2>
+<ul class="simple">
+<li><p>Use Python for general operations</p></li>
+<li><p>Use Numba for the core tensor ops</p></li>
+<li><p>Allow users to add new Numba functions</p></li>
+</ul>
+</section>
+<section >
+<h2>Code Transformation</h2>
+<p>Transform</p>
+<pre data-id="code-transformation"><code data-trim data-noescape class="python">def my_code(x, y):
+   for i in prange(100):
+       x[i] = y + 20
+...
+my_code(x, y)
+fast_my_code = numba.njit(parallel=True)(my_code)
+fast_my_code(x, y)
+fast_my_code(x, y)</code></pre>
+</section>
+<section >
+<h2>Notebook</h2>
+<p><a class="reference external" href="https://colab.research.google.com/drive/1Hiq-1SlKkFh_kkYRhmCvF2-ZOn3oxMv6#scrollTo=mlEoKQzKXkMq">Colab Notebook</a></p>
+</section>
+<section >
+<h1>Parallel</h1>
+</section>
+<section >
+<h2>Parallel</h2>
+<ul class="simple">
+<li class="fragment"><p>Run code on multiple threads</p></li>
+<li class="fragment"><p>Particularly suited for map / zip</p></li>
+<li class="fragment"><p>Baby steps towards GPU</p></li>
+</ul>
+</section>
+<section >
+<h2>Parallel Range</h2>
+<ul class="simple">
+<li class="fragment"><p>Replace <cite>for</cite> loops with parallel version</p></li>
+<li class="fragment"><p>Tells compiler it can run in any order</p></li>
+<li class="fragment"><p>Be careful! Ideally these loops don't change anything</p></li>
+</ul>
+</section>
+<section >
+<h2>Code Transformation</h2>
+<p>Transform</p>
+<pre data-id="id5"><code data-trim data-noescape class="python">def my_code(x, y):
+   for i in prange(100):
+       x[i] = y + 20
+...
+my_code(x, y)
+fast_my_code = numba.njit(parallel=True)(my_code)
+fast_my_code(x, y)
+fast_my_code(x, y)</code></pre>
+</section>
+<section >
+<h2>Nondeterminism</h2>
+<ul class="simple">
+<li class="fragment"><p>No guarantee on ordering</p></li>
+<li class="fragment"><p>Need to be careful with reductions</p></li>
+<li class="fragment"><p>Speedups will depend on system</p></li>
+</ul>
+</section>
+<section >
+<h2>Parallel Bugs</h2>
+<ul class="simple">
+<li class="fragment"><p>Warning! Nasty bugs</p></li>
+<li class="fragment"><p>Tests failing randomly</p></li>
+<li class="fragment"><p>Crashes due to out-of-bounds</p></li>
+</ul>
+</section>
+<section >
+<h2>Parallel Diagnostics</h2>
+<ul class="simple">
+<li><p>Diagnostics give parallel compilation</p></li>
+<li><p>Useful to see if you are getting benefits</p></li>
+</ul>
+</section>
+<section >
+<h1>Operator Fusion</h1>
+</section>
+<section >
+<h2>User API</h2>
+<ul class="simple">
+<li><p>Basic mathematical operations</p></li>
+<li><p>Chained together as boxes with broadcasting</p></li>
+<li><p>Optimize within each individually</p></li>
+</ul>
+</section>
+<section >
+<h2>Fusion</h2>
+<ul class="simple">
+<li><p>Optimization across operator boundary</p></li>
+<li><p>Save speed or memory in by avoiding extra forward/backward</p></li>
+<li><p>Can open even great optimization gains</p></li>
+</ul>
+</section>
+<section >
+<h2>Automatic Fusion</h2>
+<ul class="simple">
+<li><p>Compiled language can automatically fuse operators</p></li>
+<li><p>Major area of research</p></li>
+<li><p>Example: TVM, XLA, ONXX</p></li>
+</ul>
+</section>
+<section >
+<h2>Automatic Fusion</h2>
+<img alt="expgraph2.png" class="align-center" src="expgraph2.png" />
+</section>
+<section >
+<h2>Manual Fusion</h2>
+<ul class="simple">
+<li><p>Utilize a pre-fused operator when needed</p></li>
+<li><p>Standard libraries for implementations</p></li>
+</ul>
+</section>
+<section >
+<h2>Example: Matmul</h2>
+<img alt="_images/matmul3d1.png" class="align-center" src="_images/matmul3d1.png" />
+</section>
+<section >
+<h2>Example: Matmul</h2>
+<img alt="_images/matmul3d2.png" class="align-center" src="_images/matmul3d2.png" />
+</section>
+<section >
+<h2>Matmul Simple</h2>
+<img alt="_images/matmulsimple.png" class="align-center" src="_images/matmulsimple.png" />
+</section>
+<section >
+<h2>Advantages</h2>
+<ul class="simple">
+<li><p>No three dimensional intermediate</p></li>
+<li><p>No <cite>save_for_backwards</cite></p></li>
+<li><p>Can use core matmul libraries (in the future)</p></li>
+</ul>
+</section>
+<section >
+<h2>Computations</h2>
+<img alt="_images/matmul1.png" class="align-center" src="_images/matmul1.png" />
+</section>
+<section >
+<h2>Starter Code</h2>
+<ul class="simple">
+<li><p>Walk through output.</p></li>
+<li><p>Find row and column of input</p></li>
+<li><p>Simultaneous zip / reduce.</p></li>
+</ul>
+</section>
+<section >
+<h2>Example: Matmul</h2>
+<img alt="_images/matmul back.png" class="align-center" src="_images/matmul back.png" />
+</section>
+<section >
+<h2>Matrix Multiply</h2>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{eqnarray*}
+f(M, N) &amp;=&amp;  M N \\
+g'_M(f(M, N)) &amp;=&amp;  \text{grad}_{\text{out}} N^\top \\
+g'_N(f(M, N)) &amp;=&amp;  M^\top \text{grad}_{\text{out}}
+\end{eqnarray*}\end{split}\]</div>
+</section>
+<section >
+<h2>Simple Matmul</h2>
+<p>Code</p>
+<pre data-id="simple-matmul"><code data-trim data-noescape class="python">A.shape == (I, J)
+B.shape == (J, K)
+out.shape == (I, K)</code></pre>
+</section>
+<section >
+<h2>Simple Matmul Pseudocode</h2>
+<p>Code</p>
+<pre data-id="simple-matmul-pseudocode"><code data-trim data-noescape class="python">for outer_index in out.indices():
+    for inner_val in range(J):
+        out[outer_index] += A[outer_index[0], inner_val] * \
+                            B[inner_val, outer_index[1]]</code></pre>
+</section>
+<section >
+<h2>Complexities</h2>
+<ul class="simple">
+<li><p>Indices to strides</p></li>
+<li><p>Minimizing index operations</p></li>
+<li><p>Broadcasting</p></li>
+</ul>
+</section>
+<section >
+<h2>Matmul Speedups</h2>
+<p>What can be parallelized?</p>
+<pre data-id="matmul-speedups"><code data-trim data-noescape class="python">for outer_index in out.indices():
+    for inner_val in range(J):
+        out[outer_index] += A[outer_index[0], inner_val] * \
+                            B[inner_val, outer_index[1]]</code></pre>
+</section>
+<section >
+<h2>Compare to zip / reduce</h2>
+<p>Code</p>
+<pre data-id="compare-to-zip-reduce"><code data-trim data-noescape class="python">ZIP STEP
+C = zeros(broadcast_shape(A.view(I, J, 1), B.view(1, J, K)))
+for C_outer in C.indices():
+    C[C_out] = A[outer_index[0], inner_val] * \
+               B[inner_val, outer_index[1]]
+REDUCE STEP
+for outer_index in out.indices():
+   for inner_val in range(J):
+      out[outer_index] = C[outer_index[0], inner_val,
+                           outer_index[1]]</code></pre>
+</section>
+<section >
+<h2>Matrix Multiply</h2>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{eqnarray*}
+f(M, N) &amp;=&amp;  M N \\
+g'_M(f(M, N)) &amp;=&amp;  \text{grad}_{\text{out}} N^\top \\
+g'_N(f(M, N)) &amp;=&amp;  M^\top \text{grad}_{\text{out}}
+\end{eqnarray*}\end{split}\]</div>
+</section>
+
+        </div>
+    </div>
+    
+    <script src="_static/revealjs4/dist/reveal.js"></script>
+    
+    
+      <script src="_static/revealjs4/plugin/highlight/highlight.js"></script>
+      
+    
+    <script>
+        var revealjsConfig = new Object();
+        Object.assign(revealjsConfig, 
+{
+    controls: false,
+    transition: 'none',
+  history: true,
+slideNumber: true,
+  width: 960,
+  height: 700,
+
+  // Factor of the display size that should remain empty around
+  // the content
+  margin: 0.04,
+  //fragments: false,
+
+  // Bounds for smallest/largest possible scale to apply to content
+  minScale: 0.2,
+  maxScale: 2.0,
+    center: false,
+    keyboard: {
+	    67: function() { RevealChalkboard.toggleNotesCanvas() },	// toggle notes canvas when 'c' is pressed
+	    66: function() { RevealChalkboard.toggleChalkboard() },	// toggle chalkboard when 'b' is pressed
+	    46: function() { RevealChalkboard.clear() },	// clear chalkboard when 'DEL' is pressed
+	     8: function() { RevealChalkboard.reset() },	// reset chalkboard data on current slide when 'BACKSPACE' is pressed
+	    68: function() { RevealChalkboard.download() },	// downlad recorded chalkboard drawing when 'd' is pressed
+	    88: function() { RevealChalkboard.colorNext() },	// cycle colors forward when 'x' is pressed
+	    89: function() { RevealChalkboard.colorPrev() },	// cycle colors backward when 'y' is pressed
+    }
+}
+);
+        
+        
+        
+          revealjsConfig.plugins = [
+            RevealHighlight,
+          ];
+        
+        // More info https://github.com/hakimel/reveal.js#configuration
+        Reveal.initialize(revealjsConfig);
+    </script>
+
+  </body>
+</html>

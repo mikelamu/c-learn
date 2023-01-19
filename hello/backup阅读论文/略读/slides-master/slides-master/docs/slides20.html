@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+
+<html lang="english">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Machine Learning Engineering</title>
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/revealjs4/dist/reveal.css" />
+    <link rel="stylesheet" href="_static/revealjs4/dist/theme/white.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/revealjs4/plugin/highlight/zenburn.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/thebelab-helper.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    
+
+  </head><body>
+    <div class="reveal">
+        <div class="slides">
+            <link rel="stylesheet" href="_static/revealjs/css/theme/white.css">
+<link rel="stylesheet" href="_static/default.css"><section >
+<h1>Machine Learning Engineering</h1>
+</section>
+<section >
+<h2>Lecture 20</h2>
+<blockquote>
+<div><p>All About GPU 2</p>
+</div></blockquote>
+</section>
+<section >
+<h2>Admin</h2>
+<ul class="simple">
+<li class="fragment"><p>HW 2 grades</p></li>
+<li class="fragment"><p>Quiz Grades</p></li>
+</ul>
+</section>
+<section >
+<h2>Today's Class</h2>
+<ul class="simple">
+<li class="fragment"><p>Review: Memory</p></li>
+<li class="fragment"><p>CUDA Efficiency</p></li>
+<li class="fragment"><p>Efficiency Tricks</p></li>
+</ul>
+</section>
+<section >
+<h1>Memory</h1>
+</section>
+<section >
+<h2>Stack</h2>
+<ul class="simple">
+<li class="fragment"><p>Threads: Run the code</p></li>
+<li class="fragment"><p>Block: Groups &quot;close&quot; threads</p></li>
+<li class="fragment"><p>Grid: All the thread blocks</p></li>
+<li class="fragment"><p>Total Threads: <cite>threads_per_block</cite> x <cite>total_blocks</cite></p></li>
+</ul>
+</section>
+<section >
+<h2>Thread Names</h2>
+<a class="reference internal image-reference" href="_images/threadid&#64;3x.png"><img alt="_images/threadid&#64;3x.png" class="align-center" src="_images/threadid&#64;3x.png" style="width: 500px;" /></a>
+</section>
+<section >
+<h2>Block Names</h2>
+<a class="reference internal image-reference" href="_images/blockid&#64;3x.png"><img alt="_images/blockid&#64;3x.png" class="align-center" src="_images/blockid&#64;3x.png" style="width: 500px;" /></a>
+</section>
+<section >
+<h2>Memory</h2>
+<ul class="simple">
+<li><p>CUDA also has a memory stack</p></li>
+<li><p>Local &gt; Shared &gt; Global</p></li>
+<li><p>Fast code does minimal global reads</p></li>
+</ul>
+</section>
+<section >
+<h2>Local Memory</h2>
+<a class="reference internal image-reference" href="_images/local mem&#64;3x.png"><img alt="_images/local mem&#64;3x.png" class="align-center" src="_images/local mem&#64;3x.png" style="width: 500px;" /></a>
+</section>
+<section >
+<h2>Example</h2>
+<p>Code</p>
+<pre data-id="example"><code data-trim data-noescape class="python">def local_fn(out, a):
+  local = numba.cuda.local.array(10, numba.int32)
+  local[0] = 10
+  local[5] = 20
+local_fn = numba.cuda.jit()(local_fn)
+local_fn[BLOCKS, THREADS](out, a)</code></pre>
+</section>
+<section >
+<h2>Block Shared Memory</h2>
+<a class="reference internal image-reference" href="_images/sharedmem&#64;3x.png"><img alt="_images/sharedmem&#64;3x.png" class="align-center" src="_images/sharedmem&#64;3x.png" style="width: 500px;" /></a>
+</section>
+<section >
+<h2>Example</h2>
+<p>Code</p>
+<pre data-id="id2"><code data-trim data-noescape class="python">def block_fn(out, a):
+  shared = numba.cuda.shared.array(10, numba.int32)
+  shared[0] = 10
+  numba.cuda.syncthreads()
+  shared[5] = 20
+block_fn = numba.cuda.jit()(block_fn)
+block_fn[BLOCKS, THREADS](out, a)</code></pre>
+</section>
+<section >
+<h2>Quiz</h2>
+<blockquote>
+<div><p><a class="reference external" href="https://canvas.cornell.edu/courses/20583/assignments/173803">Quiz</a></p>
+</div></blockquote>
+</section>
+
+        </div>
+    </div>
+    
+    <script src="_static/revealjs4/dist/reveal.js"></script>
+    
+    
+      <script src="_static/revealjs4/plugin/highlight/highlight.js"></script>
+      
+    
+    <script>
+        var revealjsConfig = new Object();
+        Object.assign(revealjsConfig, 
+{
+    controls: false,
+    transition: 'none',
+  history: true,
+slideNumber: true,
+  width: 960,
+  height: 700,
+
+  // Factor of the display size that should remain empty around
+  // the content
+  margin: 0.04,
+  //fragments: false,
+
+  // Bounds for smallest/largest possible scale to apply to content
+  minScale: 0.2,
+  maxScale: 2.0,
+    center: false,
+    keyboard: {
+	    67: function() { RevealChalkboard.toggleNotesCanvas() },	// toggle notes canvas when 'c' is pressed
+	    66: function() { RevealChalkboard.toggleChalkboard() },	// toggle chalkboard when 'b' is pressed
+	    46: function() { RevealChalkboard.clear() },	// clear chalkboard when 'DEL' is pressed
+	     8: function() { RevealChalkboard.reset() },	// reset chalkboard data on current slide when 'BACKSPACE' is pressed
+	    68: function() { RevealChalkboard.download() },	// downlad recorded chalkboard drawing when 'd' is pressed
+	    88: function() { RevealChalkboard.colorNext() },	// cycle colors forward when 'x' is pressed
+	    89: function() { RevealChalkboard.colorPrev() },	// cycle colors backward when 'y' is pressed
+    }
+}
+);
+        
+        
+        
+          revealjsConfig.plugins = [
+            RevealHighlight,
+          ];
+        
+        // More info https://github.com/hakimel/reveal.js#configuration
+        Reveal.initialize(revealjsConfig);
+    </script>
+
+  </body>
+</html>
