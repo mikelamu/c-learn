@@ -24,7 +24,26 @@
 		//如果容器变短，则末尾超出容器长度的元素被删除。
 		resize(int num, elem); //重新指定容器的长度为num，若容器变长，则以elem值填充新位置。
 		//如果容器变短，则末尾超出容器长度的元素被删除
-	插入：
+	插入与删除：
+		push_back(ele); //尾部插入元素ele
+		pop_back(); //删除最后一个元素
+		insert(const_iterator pos, ele); //迭代器指向位置pos插入元素ele
+		insert(const_iterator pos, int count,ele); //迭代器指向位置pos插入count个元素ele
+		erase(const_iterator pos); //删除迭代器指向的元素
+		erase(const_iterator start, const_iterator end); //删除迭代器从start到end之间的元素
+		clear(); //删除容器中所有元素
+	数据存取：
+		at(int idx); //返回索引idx所指的数据
+		operator[]; //返回索引idx所指的数据
+		front(); //返回容器中第一个数据元素
+		back(); //返回容器中最后一个数据元素
+	互换容器：
+		swap(vec); // 将vec与本身的元素互换
+		利用swap收缩内存空间：
+			vector<int> (v).swap(v) 利用拷贝构造创建匿名对象，并且与自身做互换减少内存占用
+	预留空间：
+		减少vector在动态扩展容量时的扩展次数
+		reserve(int len); //容器预留len个元素长度，预留位置不初始化，元素不可访问。
 */
 #include<iostream>
 using namespace std;

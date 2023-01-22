@@ -130,11 +130,20 @@
     <ClCompile Include="2_2 vector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="2_3 deque容器.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="2_4 stack.cpp" />
+    <ClCompile Include="2_5 queue.cpp" />
+    <ClCompile Include="2_6 list.cpp" />
+    <ClCompile Include="2_7 set multiset.cpp" />
     <ClCompile Include="person.cpp" />
     <ClCompile Include="printHello.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="2_1 string容器.cpp" />
+    <ClCompile Include="2_1 string容器.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="内存模型.cpp" />
     <ClCompile Include="函数.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

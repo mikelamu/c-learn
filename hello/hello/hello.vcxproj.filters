@@ -93,6 +93,21 @@
     <ClCompile Include="2_2 vector.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="2_3 deque容器.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="2_4 stack.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="2_5 queue.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="2_6 list.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="2_7 set multiset.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="person.h">
